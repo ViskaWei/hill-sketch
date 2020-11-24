@@ -9,7 +9,7 @@ from collections import Counter
 import warnings
 warnings.simplefilter("ignore")
 from code.data.stream import horner_decode
-from code.CS.csvec import CSVec
+from code.sketch.csvec import CSVec
 
 def get_exact_HH(stream,topk):
     print(f'=============exact counting HHs==============')
@@ -19,8 +19,8 @@ def get_exact_HH(stream,topk):
     print('exact counting time:{:.2f}'.format(t))
     return exactHH[:,0], exactHH[:,1], t
 
-def get_HH_pd(stream,base,ftr_len, dtype, exact, topk, r=16, d=1000000,c=None,device=None):
-    if exact:
+def get_HH_pd(stream,base,ftr_len, dtype, isExact, topk, r=16, d=1000000,c=None,device=None):
+    if isExact:
         HH,freq,t=get_exact_HH(stream,topk)
         HHfreq=np.vstack((HH,freq))
     else:
@@ -28,11 +28,11 @@ def get_HH_pd(stream,base,ftr_len, dtype, exact, topk, r=16, d=1000000,c=None,de
         HHfreq=np.vstack((HH,freq))
     mat_decode_HH=horner_decode(HH,base,ftr_len, dtype)
     assert (mat_decode_HH.min().min()>=0) & (mat_decode_HH.max().max()<=base-1)
-    HH_pd=pd.DataFrame(np.hstack((mat_decode_HH,HHfreq.T)), columns=list(range(ftr_len))+['HH','freq']) 
-    HH_pd['rk']=HH_pd['freq'].cumsum()
-    HH_pd['ra']=HH_pd['rk']/HH_pd['rk'].values[-1]
+    dfHH=pd.DataFrame(np.hstack((mat_decode_HH,HHfreq.T)), columns=list(range(ftr_len))+['HH','freq']) 
+    dfHH['rk']=dfHH['freq'].cumsum()
+    dfHH['ra']=dfHH['rk']/dfHH['rk'].values[-1]
     # HH_dict={HH_pd['HH'].values[ii].astype('int'):ii for ii in range(len(HH_pd['HH'])) }
-    return HH_pd
+    return dfHH
 
 def get_CS_HH(stream,d,c,r,k,device):
     if c is None: c=10*k 
