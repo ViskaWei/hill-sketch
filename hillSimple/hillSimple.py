@@ -11,6 +11,18 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 from scipy.spatial.distance import cdist
 
+
+def prepro_data(data, isCenter=True, dimPCA=6,isPlot=True,method='minmax'):
+    if isCenter: 
+        dataPREPRO = data - data.mean().mean() 
+    else:
+        dataPREPRO = data
+    matPCA = get_pca(dataPREPRO, dimPCA = dimPCA, isPlot=isPlot)   
+    matNorm = get_norm(matPCA, method=method, isPlot=isPlot)   
+    # dfRebin = get_rebin(matNorm,base)
+    return matNorm
+
+
 ########################### Loading #######################################
 
 def load_data(DATASET):
@@ -44,10 +56,13 @@ def get_cluster(outTSNE, nCluster):
     min_dist = np.min(cdist(outTSNE, kmap.cluster_centers_, 'euclidean'), axis=1)    
     return cluster_id, min_dist, kmap
 
-
-def run_hill_simple(DATASET, nCluster=10, PCA_dim = 6):
+def run_hill_simple(DATASET, nCluster=10, PCA_dim = 6,isCenter=True):
     data,keep_columns = load_data(DATASET)
-    matPCA = get_pca(data,dim=PCA_dim)
+    if isCenter: 
+        dataPREPRO = data - data.mean().mean() 
+    else:
+        dataPREPRO = data
+    matPCA = get_pca(dataPREPRO,dim=PCA_dim)
     matTSNE = get_tsne(matPCA)    
     cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
     data['t1'] = matTSNE[:,0]
