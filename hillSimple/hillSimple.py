@@ -61,10 +61,10 @@ def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, n
     grouped = data.groupby([f'C{nCluster}'])
     cid = grouped[f'M{nCluster}'].idxmin().values
     print('center Id:', cid)
-    cMat = data.iloc[cid][keep_columns]
     data['t1'] = matTSNE[:,0]
     data['t2'] = matTSNE[:,1]    
     if isVol: data['vol'] = vol
+    cMat = data.iloc[cid][keep_columns]
     return data,kmap,cMat
 
 ########################### Plotting #######################################
