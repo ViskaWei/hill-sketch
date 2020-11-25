@@ -47,7 +47,7 @@ def get_cluster(outTSNE, nCluster):
     min_dist = np.min(cdist(outTSNE, kmap.cluster_centers_, 'euclidean'), axis=1)    
     return cluster_id, min_dist, kmap
 
-def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, nCluster=10):
+def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, nCluster=10,offset=1):
     data,keep_columns, vol = load_data(DATASET, name=name, isVol=isVol)
     if isCenter: 
         dataPREPRO = data - data.mean().mean() 
@@ -69,6 +69,7 @@ def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, n
         cluster_vol = grouped['vol'].sum().values
         print('cluster volumn sum:', cluster_vol.sum().round(3)) 
         cMat['vol'] = cluster_vol
+    cMat.index+=offset
     return data,kmap,cMat
 
 ########################### Plotting #######################################
