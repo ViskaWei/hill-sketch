@@ -9,6 +9,7 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
 
+
 def get_matUMAP(dfNorm,dfHH, nCluster, base, ratio=0.8,dimPCA=6, ftr=None, isPlot=True):
     umapT = get_umapT(dfHH,ratio=ratio,dimPCA=dimPCA, ftr=ftr, isPlot=isPlot)
     matUMAP = get_mapped(dfNorm,base,umapT)

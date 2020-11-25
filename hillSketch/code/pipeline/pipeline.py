@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from code.data.dataset import load_data
 from code.data.bulk import prepro_data
 from code.data.stream import get_encode_stream
-from code.sketch.HH import get_HH_pd
+from code.sketch.exact import get_HH_pd
 from code.cluster.project import get_matUMAP
 
 
@@ -16,7 +16,7 @@ def run_hill_sketch(DATASET, nCluster, dimPCA, base, name='k', isVol=True, isCen
     data,keep_columns,vol = load_data(DATASET,name=name, isVol=isVol)
     dfNorm = prepro_data(data, isCenter=isCenter, dimPCA=dimPCA,isPlot=isPlot,method='minmax')
     stream = get_encode_stream(dfNorm, base, dtype='uint64')
-    dfHH = get_HH_pd(stream,base,dimPCA, dtype, True, None, r=16, d=1000000,c=None,device=None)
+    dfHH = get_HH_pd(stream,base,dimPCA, dtype)
     matUMAP,cluster_id, min_dist, kmap = get_matUMAP(dfNorm,dfHH,nCluster, base,\
                                                  ratio=0.8,dimPCA=dimPCA, ftr=None, isPlot=isPlot)
     data[f'C{nCluster}'] = cluster_id
