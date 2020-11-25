@@ -1,9 +1,13 @@
 import numpy as np
 import copy
 
-def get_encode_stream(df_norm, base, dtype='uint64'):
-    mat=(df_norm*(base-1)).round()
-    assert (mat.min().min()>=0) & (mat.max().max()<=base-1)
+def get_rebin(dfNorm, base):
+    dfRebin=(dfNorm*(base-1)).round()
+    assert (dfRebin.min().min()>=0) & (dfRebin.max().max()<=base-1)
+    return dfRebin
+
+def get_encode_stream(dfNorm, base, dtype='uint64'):
+    mat = get_rebin(dfNorm,base)
     mat_encode=horner_encode(mat,base,dtype) 
     mat_decode=horner_decode(mat_encode,base,len(mat.keys()),dtype)  
     assert (mat_decode.min().min()>=0) & (mat_decode.max().max()<=base-1)

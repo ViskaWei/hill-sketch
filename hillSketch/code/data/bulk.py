@@ -9,7 +9,8 @@ def prepro_data(data, isCenter=True, dimPCA=6,isPlot=True,method='minmax'):
     else:
         dataPREPRO = data
     matPCA = get_PCA(dataPREPRO, dimPCA = dimPCA, isPlot=isPlot)   
-    matNorm = get_norm(matPCA, method=method, isPlot=isPlot)    
+    matNorm = get_norm(matPCA, method=method, isPlot=isPlot)   
+    # dfRebin = get_rebin(matNorm,base)
     return matNorm
 
 ######################## PCA ###########################
@@ -38,3 +39,8 @@ def get_norm(matPCA, method='minmax', isPlot=False):
     else:
         raise 'select or implement norm method'
     return matNorm
+
+# def get_rebin(dfNorm, base):
+#     dfRebin=(dfNorm*(base-1)).round()
+#     assert (dfRebin.min().min()>=0) & (dfRebin.max().max()<=base-1)
+#     return dfRebin
