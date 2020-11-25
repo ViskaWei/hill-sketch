@@ -65,8 +65,10 @@ def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, n
     print('center Id:', cid)
     data['t1'] = matTSNE[:,0]
     data['t2'] = matTSNE[:,1]    
-    print(grouped['vol'].sum())
-    if isVol: cMat['vol'] = grouped['vol'].sum().values
+    if isVol:
+        cluster_vol = grouped['vol'].sum().values
+        print('cluster volumn sum:', cluster_vol.sum().round(3)) 
+        cMat['vol'] = cluster_vol
     return data,kmap,cMat
 
 ########################### Plotting #######################################
