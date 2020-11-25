@@ -4,7 +4,6 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
-# import copy
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -47,13 +46,13 @@ def get_cluster(outTSNE, nCluster):
     min_dist = np.min(cdist(outTSNE, kmap.cluster_centers_, 'euclidean'), axis=1)    
     return cluster_id, min_dist, kmap
 
-def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, nCluster=10,offset=1):
+def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, dimPCA = 6, nCluster=10,offset=1):
     data,keep_columns, vol = load_data(DATASET, name=name, isVol=isVol)
     if isCenter: 
         dataPREPRO = data - data.mean().mean() 
     else:
         dataPREPRO = data
-    matPCA = get_pca(dataPREPRO,dim=PCA_dim)
+    matPCA = get_pca(dataPREPRO,dim=dimPCA)
     matTSNE = get_tsne(matPCA)    
     cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
     data[f'C{nCluster}'] = cluster_id
@@ -75,13 +74,15 @@ def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, n
 ########################### Plotting #######################################
 
 def plot_data(data,kmap):
-    sns.scatterplot(
+    f,axes = plt.subplots(1,2, figsize=(20,5))
+    sns.scatterplot(ax=axes[0],
             x='t1', y='t2',
             hue= kmap.labels_+1 , marker='x',s=5,
             palette=sns.color_palette("muted", kmap.n_clusters),
             data=data,
             legend="full")
-    plt.scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r')  
+    axes[0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
+    axes[1].plot(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
 
 
 ########################### Saving #######################################
