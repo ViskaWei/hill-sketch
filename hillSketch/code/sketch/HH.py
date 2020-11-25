@@ -19,6 +19,8 @@ def get_exact_HH(stream,topk):
     print('exact counting time:{:.2f}'.format(t))
     return exactHH[:,0], exactHH[:,1], t
 
+
+
 def get_HH_pd(stream,base,ftr_len, dtype, isExact, topk, r=16, d=1000000,c=None,device=None):
     if isExact:
         HH,freq,t=get_exact_HH(stream,topk)

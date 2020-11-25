@@ -25,7 +25,7 @@ def load_data(DATASET, name='k', isVol=True):
     keep_columns = data.columns[(data.sum()!=0)]
     keep_data = data[keep_columns]
     vol = keep_data.pop('vol') if isVol else None
-    return keep_data, keep_columns, vol 
+    return keep_data, keep_data.columns, vol 
 
 ########################### Preprocessing #######################################
 
@@ -58,13 +58,15 @@ def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, n
     cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
     data[f'C{nCluster}'] = cluster_id
     data[f'M{nCluster}'] = min_dist
+    if isVol: data['vol'] = vol
     grouped = data.groupby([f'C{nCluster}'])
     cid = grouped[f'M{nCluster}'].idxmin().values
+    cMat = data.iloc[cid][keep_columns]
     print('center Id:', cid)
     data['t1'] = matTSNE[:,0]
     data['t2'] = matTSNE[:,1]    
-    if isVol: data['vol'] = vol
-    cMat = data.iloc[cid][keep_columns]
+    print(grouped['vol'].sum())
+    if isVol: cMat['vol'] = grouped['vol'].sum().values
     return data,kmap,cMat
 
 ########################### Plotting #######################################
