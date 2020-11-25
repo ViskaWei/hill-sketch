@@ -18,3 +18,4 @@ bin-release/
 # information for Eclipse / Flash Builder.
 data/sketch/*
 .ipynb_checkpoints
+__pycache__
