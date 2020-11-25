@@ -23,8 +23,9 @@ def load_data(DATASET, name='k', isVol=True):
     else:
         raise 'can only read csv or xlsx file'
     keep_columns = data.columns[(data.sum()!=0)]
-    print(keep_columns)
-    return data[keep_columns], keep_columns 
+    keep_data = data[keep_columns]
+    vol = keep_data.pop('vol') if isVol else None
+    return keep_data, keep_columns, vol 
 
 ########################### Preprocessing #######################################
 
@@ -47,7 +48,7 @@ def get_cluster(outTSNE, nCluster):
     return cluster_id, min_dist, kmap
 
 def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, nCluster=10):
-    data,keep_columns = load_data(DATASET, name=name, isVol=isVol)
+    data,keep_columns, vol = load_data(DATASET, name=name, isVol=isVol)
     if isCenter: 
         dataPREPRO = data - data.mean().mean() 
     else:
@@ -55,14 +56,15 @@ def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, n
     matPCA = get_pca(dataPREPRO,dim=PCA_dim)
     matTSNE = get_tsne(matPCA)    
     cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
-    data['t1'] = matTSNE[:,0]
-    data['t2'] = matTSNE[:,1]    
     data[f'C{nCluster}'] = cluster_id
     data[f'M{nCluster}'] = min_dist
     grouped = data.groupby([f'C{nCluster}'])
     cid = grouped[f'M{nCluster}'].idxmin().values
     print('center Id:', cid)
     cMat = data.iloc[cid][keep_columns]
+    data['t1'] = matTSNE[:,0]
+    data['t2'] = matTSNE[:,1]    
+    if isVol: data['vol'] = vol
     return data,kmap,cMat
 
 ########################### Plotting #######################################
@@ -85,7 +87,7 @@ def save_cluster_ids(data, nCluster, outDir=None,name='kMat'):
         c = np.where(lbl==i)[0]+1   
         print(f'Cluster{i}: {c[:3]}..')
         np.savetxt(f'{outDir}{name}_C{nCluster}_c{i}.txt', c, fmt="%d")    
-        
+
 def save_centers(cMat,nCluster,outDir=None,name='cMat'):
     if outDir is None: outDir = './'
     cMat.to_csv(f'{outDir}{name}_C{nCluster}.csv') 
