@@ -11,25 +11,15 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 from scipy.spatial.distance import cdist
 
-
-def prepro_data(data, isCenter=True, dimPCA=6,isPlot=True,method='minmax'):
-    if isCenter: 
-        dataPREPRO = data - data.mean().mean() 
-    else:
-        dataPREPRO = data
-    matPCA = get_pca(dataPREPRO, dimPCA = dimPCA, isPlot=isPlot)   
-    matNorm = get_norm(matPCA, method=method, isPlot=isPlot)   
-    # dfRebin = get_rebin(matNorm,base)
-    return matNorm
-
-
 ########################### Loading #######################################
 
-def load_data(DATASET):
+def load_data(DATASET, name='k', isVol=True):
+    columns = [f'{name}{i}' for i in range(1,37)]
+    if isVol: columns = columns + ['vol']
     if DATASET[-3:]=='csv':
-        data = pd.read_csv(DATASET)    
+        data = pd.read_csv(DATASET, names = columns)    
     elif DATASET[-4:]=='xlsx':
-        data = pd.read_excel(DATASET)    
+        data = pd.read_excel(DATASET, names = columns)    
     else:
         raise 'can only read csv or xlsx file'
     keep_columns = data.columns[(data.sum()!=0)]
