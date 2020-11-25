@@ -19,3 +19,4 @@ bin-release/
 data/sketch/*
 .ipynb_checkpoints
 __pycache__
+hillSketch/code/sketch/*
