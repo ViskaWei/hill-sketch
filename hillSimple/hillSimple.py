@@ -46,8 +46,8 @@ def get_cluster(outTSNE, nCluster):
     min_dist = np.min(cdist(outTSNE, kmap.cluster_centers_, 'euclidean'), axis=1)    
     return cluster_id, min_dist, kmap
 
-def run_hill_simple(DATASET, nCluster=10, PCA_dim = 6,isCenter=True):
-    data,keep_columns = load_data(DATASET)
+def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, PCA_dim = 6, nCluster=10):
+    data,keep_columns = load_data(DATASET, name=name, isVol=isVol)
     if isCenter: 
         dataPREPRO = data - data.mean().mean() 
     else:
@@ -85,6 +85,7 @@ def save_cluster_ids(data, nCluster, outDir=None,name='kMat'):
         c = np.where(lbl==i)[0]+1   
         print(f'Cluster{i}: {c[:3]}..')
         np.savetxt(f'{outDir}{name}_C{nCluster}_c{i}.txt', c, fmt="%d")    
+        
 def save_centers(cMat,nCluster,outDir=None,name='cMat'):
     if outDir is None: outDir = './'
     cMat.to_csv(f'{outDir}{name}_C{nCluster}.csv') 
