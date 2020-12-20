@@ -46,13 +46,13 @@ def get_cluster(outTSNE, nCluster):
     min_dist = np.min(cdist(outTSNE, kmap.cluster_centers_, 'euclidean'), axis=1)    
     return cluster_id, min_dist, kmap
 
-def run_hill_simple(DATASET, name='k', isVol=True, isCenter=True, dimPCA = 6, nCluster=10,offset=1):
+def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True, offset=1):
     data,keep_columns, vol = load_data(DATASET, name=name, isVol=isVol)
     if isCenter: 
         dataPREPRO = data - data.mean().mean() 
     else:
         dataPREPRO = data
-    matPCA = get_pca(dataPREPRO,dim=dimPCA)
+    matPCA = get_pca(dataPREPRO,dim=nPCA)
     matTSNE = get_tsne(matPCA)    
     cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
     data[f'C{nCluster}'] = cluster_id
@@ -82,7 +82,7 @@ def plot_data(data,kmap):
             data=data,
             legend="full")
     axes[0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
-    axes[1].plot(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
 
 
 ########################### Saving #######################################
