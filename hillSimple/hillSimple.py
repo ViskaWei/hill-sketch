@@ -35,7 +35,7 @@ def get_pca(mat, dim=6):
     return matPCA
 
 def get_tsne(matPCA):
-    matTSNE = TSNE(n_components=2).fit_transform(matPCA)
+    matTSNE = TSNE(n_components=2, random_state = 525).fit_transform(matPCA)
     print(matTSNE.shape)
     return matTSNE
 
