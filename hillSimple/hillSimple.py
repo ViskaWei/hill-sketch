@@ -29,7 +29,7 @@ def load_data(DATASET, name='k', isVol=True):
 ########################### Preprocessing #######################################
 
 def get_pca(mat, dim=6):
-    pca = PCA(n_components=dim)    
+    pca = PCA(n_components=dim, random_state = 907)    
     matPCA=pca.fit_transform(mat)    
     print(matPCA.shape)
     return matPCA
@@ -52,7 +52,7 @@ def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True
         dataPREPRO = data - data.mean().mean() 
     else:
         dataPREPRO = data
-    matPCA = get_pca(dataPREPRO,dim=nPCA, random_state = 907)
+    matPCA = get_pca(dataPREPRO,dim=nPCA)
     matTSNE = get_tsne(matPCA)    
     cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
     data[f'C{nCluster}'] = cluster_id
