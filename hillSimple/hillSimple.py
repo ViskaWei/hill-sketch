@@ -36,10 +36,10 @@ def get_pca(mat, dim=6):
     print(matPCA.shape)
     return matPCA
 
-def get_tsne(matPCA):
-    matTSNE = TSNE(n_components=2, random_state = 525).fit_transform(matPCA)
-    print(matTSNE.shape)
-    return matTSNE
+# def get_tsne(matPCA):
+#     matTSNE = TSNE(n_components=2, random_state = 525).fit_transform(matPCA)
+#     print(matTSNE.shape)
+#     return matTSNE
 
 def get_umap(matPCA):
     umapT = umap.UMAP(n_components=2, min_dist=0.0, n_neighbors=50, random_state=926)
@@ -54,17 +54,14 @@ def get_cluster(outEmbed, nCluster):
     min_dist = np.min(cdist(outEmbed, kmap.cluster_centers_, 'euclidean'), axis=1)    
     return cluster_id, min_dist, kmap
 
-def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True, offset=1,method="UMAP"):
+def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True, offset=1):
     data,keep_columns, vol = load_data(DATASET, name=name, isVol=isVol)
     if isCenter: 
         dataPREPRO = data - data.mean().mean() 
     else:
         dataPREPRO = data
     matPCA = get_pca(dataPREPRO,dim=nPCA)
-    if method =="UMAP":
-        matEmbed = get_umap(matPCA)
-    else:
-        matEmbed = get_tsne(matPCA)    
+    matEmbed = get_umap(matPCA)
     cluster_id, min_dist, kmap = get_cluster(matEmbed, nCluster)
     data[f'C{nCluster}'] = cluster_id
     data[f'M{nCluster}'] = min_dist
@@ -95,6 +92,7 @@ def plot_data(data,kmap, cut = 2000, rng=50):
     axes[0][0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
     axes[0][1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
     axes[1][1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[1][1].axvline(cut)
     axes[1][1].set_xlim(cut-rng,cut+rng)
 
 ########################### Saving #######################################
