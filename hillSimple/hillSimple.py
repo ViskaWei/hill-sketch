@@ -52,7 +52,7 @@ def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True
         dataPREPRO = data - data.mean().mean() 
     else:
         dataPREPRO = data
-    matPCA = get_pca(dataPREPRO,dim=nPCA)
+    matPCA = get_pca(dataPREPRO,dim=nPCA, random_state = 907)
     matTSNE = get_tsne(matPCA)    
     cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
     data[f'C{nCluster}'] = cluster_id
