@@ -4,11 +4,13 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import umap
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 from scipy.spatial.distance import cdist
+
 
 ########################### Loading #######################################
 
@@ -39,22 +41,31 @@ def get_tsne(matPCA):
     print(matTSNE.shape)
     return matTSNE
 
-def get_cluster(outTSNE, nCluster):
+def get_umap(matPCA):
+    umapT = umap.UMAP(n_components=2, min_dist=0.0, n_neighbors=50, random_state=926)
+    matUMAP = umapT.fit_transform(matPCA)
+    print(matUMAP.shape)
+    return matUMAP
+
+def get_cluster(outEmbed, nCluster):
     kmap = KMeans(n_clusters=nCluster,n_init=30, algorithm='elkan',random_state=227)
-    kmap.fit(outTSNE, sample_weight = None)
+    kmap.fit(outEmbed, sample_weight = None)
     cluster_id = kmap.labels_ + 1
-    min_dist = np.min(cdist(outTSNE, kmap.cluster_centers_, 'euclidean'), axis=1)    
+    min_dist = np.min(cdist(outEmbed, kmap.cluster_centers_, 'euclidean'), axis=1)    
     return cluster_id, min_dist, kmap
 
-def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True, offset=1):
+def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True, offset=1,method="UMAP"):
     data,keep_columns, vol = load_data(DATASET, name=name, isVol=isVol)
     if isCenter: 
         dataPREPRO = data - data.mean().mean() 
     else:
         dataPREPRO = data
     matPCA = get_pca(dataPREPRO,dim=nPCA)
-    matTSNE = get_tsne(matPCA)    
-    cluster_id, min_dist, kmap = get_cluster(matTSNE, nCluster)
+    if method =="UMAP":
+        matEmbed = get_umap(matPCA)
+    else:
+        matEmbed = get_tsne(matPCA)    
+    cluster_id, min_dist, kmap = get_cluster(matEmbed, nCluster)
     data[f'C{nCluster}'] = cluster_id
     data[f'M{nCluster}'] = min_dist
     if isVol: data['vol'] = vol
@@ -62,8 +73,8 @@ def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True
     cid = grouped[f'M{nCluster}'].idxmin().values
     cMat = data.iloc[cid][keep_columns]
     print('center Id:', cid)
-    data['t1'] = matTSNE[:,0]
-    data['t2'] = matTSNE[:,1]    
+    data['t1'] = matEmbed[:,0]
+    data['t2'] = matEmbed[:,1]    
     if isVol:
         cluster_vol = grouped['vol'].sum().values
         print('cluster volumn sum:', cluster_vol.sum().round(3)) 
@@ -73,17 +84,18 @@ def run_hill_simple(DATASET, nCluster, nPCA, name='k', isVol=True, isCenter=True
 
 ########################### Plotting #######################################
 
-def plot_data(data,kmap):
-    f,axes = plt.subplots(1,2, figsize=(20,5))
-    sns.scatterplot(ax=axes[0],
+def plot_data(data,kmap, cut = 2000, rng=50):
+    f, axes = plt.subplots(2,2, figsize=(16,10))
+    sns.scatterplot(ax=axes[0][0],
             x='t1', y='t2',
             hue= kmap.labels_+1 , marker='x',s=5,
             palette=sns.color_palette("muted", kmap.n_clusters),
             data=data,
             legend="full")
-    axes[0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
-    axes[1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
-
+    axes[0][0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
+    axes[0][1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[1][1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[1][1].set_xlim(cut-rng,cut+rng)
 
 ########################### Saving #######################################
 def save_cluster_ids(data, nCluster, outDir=None,name='kMat'):

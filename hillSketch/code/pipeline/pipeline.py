@@ -35,16 +35,19 @@ def run_hill_sketch(DATASET, nCluster, dimPCA, base, name='k', isVol=True, isCen
     cMat.index+=offset
     return data,kmap,cMat
 
-def plot_data(data,kmap):
-    f,axes = plt.subplots(1,2, figsize=(20,5))
-    sns.scatterplot(ax=axes[0],
+def plot_data(data,kmap, cut = 2000, rng=50):
+    f, axes = plt.subplots(2,2, figsize=(16,10))
+    sns.scatterplot(ax=axes[0][0],
             x='t1', y='t2',
             hue= kmap.labels_+1 , marker='x',s=5,
             palette=sns.color_palette("muted", kmap.n_clusters),
             data=data,
             legend="full")
-    axes[0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
-    axes[1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[0][0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
+    axes[0][1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[1][1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[1][1].set_xlim(cut-rng,cut+rng)
+
 
 
 ########################### Saving #######################################
