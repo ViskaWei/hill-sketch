@@ -44,7 +44,7 @@ def plot_data(data,kmap):
             data=data,
             legend="full")
     axes[0].scatter(kmap.cluster_centers_[:,0],kmap.cluster_centers_[:,1], c='r') 
-    axes[1].plot(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
+    axes[1].scatter(list(range(data.shape[0])), data[f'C{kmap.n_clusters}'])
 
 
 ########################### Saving #######################################
