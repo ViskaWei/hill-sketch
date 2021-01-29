@@ -58,7 +58,7 @@ def save_cluster_ids(data, nCluster, outDir=None,name='kMat'):
     lbl = data[f'C{nCluster}']
     for i in range(1,nCluster+1):
         c = np.where(lbl==i)[0]+1   
-        print(f'Cluster{i}: {c[:3]}..')
+        print(f'Cluster{i} of len{len(c)}: {c[:3]}..')
         np.savetxt(f'{outDir}{name}_C{nCluster}_c{i}.txt', c, fmt="%d")    
 
 def save_centers(cMat,nCluster,outDir=None,name='cMat'):
