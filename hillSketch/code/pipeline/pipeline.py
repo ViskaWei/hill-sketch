@@ -15,8 +15,10 @@ def run_hill_sketch(DATASET, nCluster, dimPCA, base, name='k', isVol=True, isCen
                 dtype='uint64', offset=1,isPlot=False):
     data,keep_columns,vol = load_data(DATASET,name=name, isVol=isVol)
     dfNorm = prepro_data(data, isCenter=isCenter, dimPCA=dimPCA,isPlot=isPlot,method='minmax')
+    dfNorm = pd.DataFrame(data = dfNorm)
     stream = get_encode_stream(dfNorm, base, dtype=dtype)
     dfHH = get_HH_pd(stream,base,dimPCA, dtype)
+    # dfHHh = dfHH[dfHH['freq']>10]
     matUMAP,cluster_id, min_dist, kmap = get_matUMAP(dfNorm,dfHH,nCluster, base,\
                                                  ratio=0.8,dimPCA=dimPCA, ftr=None, isPlot=isPlot)
     data[f'C{nCluster}'] = cluster_id
